@@ -1,18 +1,12 @@
 package com.bezdekova.bookstore.db
 
-import jakarta.persistence.*
+import org.springframework.data.annotation.Id
+import org.springframework.data.mongodb.core.mapping.Document
 
-@Entity
-@Table(name = "authors")
-class Author {
+@Document
+class Author(id: String, name: String) {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    var id: Int = 0
+    lateinit var id: String
     lateinit var name: String
-
-    protected constructor()
-    constructor(name: String) {
-        this.name = name
-    }
 
 }

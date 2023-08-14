@@ -14,7 +14,7 @@ class AuthorServiceImpl @Autowired constructor(private val authorRepository: Aut
     override val allAuthors: List<Author>
         get() = authorRepository.findAll()
 
-    override fun getAuthorById(id: Int): Author {
+    override fun getAuthorById(id: String): Author {
         return authorRepository.findById(id)
                 .orElseThrow { ResponseStatusException(HttpStatus.NOT_FOUND, "Author not found.") }
     }
