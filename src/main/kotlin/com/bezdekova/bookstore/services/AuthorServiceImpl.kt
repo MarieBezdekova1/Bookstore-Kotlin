@@ -25,4 +25,24 @@ class AuthorServiceImpl @Autowired constructor(private val authorRepository: Aut
         return authorRepository.save(author)
     }
 
+    override fun updateAuthor(id: String, authorRequest: AuthorRequest): Author? {
+        val author = authorRepository.findById(id)
+        return if (author.isPresent) {
+            val authorExists = author.get()
+            authorExists.name = authorRequest.name
+            authorRepository.save<Author>(authorExists)
+        } else {
+            throw ResponseStatusException(HttpStatus.NOT_FOUND, "Author not found.")
+        }
+    }
+
+    override fun deleteAuthor(id: String) {
+        val author = authorRepository.findById(id)
+        return if (author.isPresent) {
+            authorRepository.deleteById(id)
+        } else {
+            throw ResponseStatusException(HttpStatus.NOT_FOUND, "Author not found.")
+        }
+    }
+
 }

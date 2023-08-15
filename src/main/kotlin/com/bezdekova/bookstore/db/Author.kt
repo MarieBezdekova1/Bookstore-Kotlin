@@ -7,5 +7,5 @@ import org.springframework.data.mongodb.core.mapping.Document
 data class Author(
         @Id
         val id: String,
-        val name: String) {
+        var name: String) {
 }

@@ -7,4 +7,6 @@ interface AuthorService {
     val allAuthors: List<Author>
     fun getAuthorById(id: String): Author?
     fun createAuthor(authorRequest: AuthorRequest): Author?
+    fun updateAuthor(id: String, authorRequest: AuthorRequest): Author?
+    fun deleteAuthor(id: String)
 }
