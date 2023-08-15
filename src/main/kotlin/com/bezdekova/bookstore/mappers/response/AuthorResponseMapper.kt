@@ -8,6 +8,9 @@ import org.springframework.stereotype.Component
 class AuthorResponseMapper() {
 
     fun map(author: Author?): AuthorResponse? {
-        return AuthorResponse(author?.name)
+        if (author != null) {
+            return AuthorResponse(author.id, author.name)
+        }
+        return null
     }
 }

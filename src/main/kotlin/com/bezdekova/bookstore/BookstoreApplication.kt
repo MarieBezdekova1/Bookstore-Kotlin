@@ -23,11 +23,8 @@ class BookstoreApplication : CommandLineRunner {
     override fun run(vararg args: String?) {
         repository.deleteAll()
 
-        // Save a couple of customers
-        repository.save(Author("1", "Alice Smith"))
-        repository.save(Author("2", "Bob Smith"))
-
-        println(repository.findByName("Alice Smith"))
+        repository.save(Author("52345234", "Bob Smith"))
+        repository.save(Author("45345", "Alice Smith"))
 
         println("Authors found with findAll():")
         println("-------------------------------")
@@ -35,18 +32,16 @@ class BookstoreApplication : CommandLineRunner {
             println(author)
         }
         println()
-        /*
 
         println("Customer found with findByName('Alice Smith'):")
         println("--------------------------------")
         println(repository.findByName("Alice Smith"))
 
-        println("Customers found with findByLastName('Smith'):")
+        println("Customers found with findByName('Smith'):")
         println("--------------------------------")
         for (author in repository.findAllByName("Alice Smith")!!) {
             println(author)
         }
-         */
 
     }
 }

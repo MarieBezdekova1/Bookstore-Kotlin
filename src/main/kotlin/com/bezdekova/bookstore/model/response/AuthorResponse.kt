@@ -1,4 +1,4 @@
 package com.bezdekova.bookstore.model.response
 
 @JvmRecord
-data class AuthorResponse(val name: String?)
+data class AuthorResponse(val id: String, val name: String)
