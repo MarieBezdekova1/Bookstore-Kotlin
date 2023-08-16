@@ -1,6 +1,7 @@
 package com.bezdekova.bookstore.controllers
 
 import com.bezdekova.bookstore.constant.MappingConstants
+import com.bezdekova.bookstore.mappers.command.AuthorCommandMapper
 import com.bezdekova.bookstore.mappers.response.AuthorResponseMapper
 import com.bezdekova.bookstore.model.request.AuthorRequest
 import com.bezdekova.bookstore.model.response.AuthorResponse
@@ -9,9 +10,10 @@ import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 
 @RestController
-class AuthorController internal constructor(
+class AuthorController (
         private val authorService: AuthorService,
-        private val authorResponseMapper: AuthorResponseMapper
+        private val authorResponseMapper: AuthorResponseMapper,
+        private val authorCommandMapper: AuthorCommandMapper
 ) {
 
     @get:ResponseStatus(HttpStatus.OK)
@@ -35,8 +37,15 @@ class AuthorController internal constructor(
 
     @PutMapping(MappingConstants.AUTHORS + "/{id}")
     @ResponseStatus(HttpStatus.OK)
-    fun updateAuthor(@PathVariable id: String, @RequestBody authorRequest: AuthorRequest): AuthorResponse? {
-        return authorResponseMapper.map(authorService.updateAuthor(id, authorRequest))
+    // v kotlinu se obvykle využívá modifikatoru objektu - run / let / apply atd.
+    // tady nechceš vracet nullable objekt
+    fun updateAuthor(@PathVariable id: String, @RequestBody authorRequest: AuthorRequest): AuthorResponse {
+        // nejprve vytvoš objekt, který chceš posílat do servisy. Je dobré do servisy posílat jeden objekt, pak je možné použít dvojtečkovou notaci - viz další řádek
+        return authorCommandMapper.map(id = id, request = authorRequest)
+            // pak co s tím objektem chceš udělat
+            .run(authorService::updateAuthor)
+            // nakonec v jakém stylu to chceš vracet
+            .let(authorResponseMapper::map)
     }
 
     @DeleteMapping(MappingConstants.AUTHORS + "/{id}")
