@@ -13,7 +13,7 @@ import org.springframework.web.server.ResponseStatusException
 
 @Service
 // nemusíš psát @Autowired constructor, stačí servisy a componenty jen přidat do builderu servisy
-// servisa by nem2la vracet nullable objekty
+// servisa by neměla vracet nullable objekty
 class AuthorServiceImpl(
     private val authorRepository: AuthorRepository
 ) : AuthorService {
