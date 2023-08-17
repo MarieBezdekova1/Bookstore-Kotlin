@@ -44,6 +44,6 @@ class WebSecurityConfig {
                 .password(passwordEncoder.encode("password"))
                 .roles("USER")
                 .build()
-        return InMemoryUserDetailsManager(user, user)
+        return InMemoryUserDetailsManager(user)
     }
 }
