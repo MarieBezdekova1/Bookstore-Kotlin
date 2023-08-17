@@ -2,20 +2,13 @@ package com.bezdekova.bookstore
 
 import com.bezdekova.bookstore.db.Author
 import com.bezdekova.bookstore.repositories.AuthorRepository
-import org.springframework.beans.factory.annotation.Autowired
+import org.bson.types.ObjectId
 import org.springframework.boot.CommandLineRunner
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
-import org.springframework.data.mongodb.core.MongoTemplate
 
 @SpringBootApplication
-class BookstoreApplication : CommandLineRunner {
-
-    @Autowired
-    private lateinit var repository: AuthorRepository
-
-    @Autowired
-    private lateinit var template: MongoTemplate
+class BookstoreApplication(private var repository: AuthorRepository, ) : CommandLineRunner {
 
     companion object {
         @JvmStatic
@@ -25,10 +18,8 @@ class BookstoreApplication : CommandLineRunner {
     }
 
     override fun run(vararg args: String?) {
-        repository.deleteAll()
-
-        template.save(Author("052345234", "Bob Smith"))
-        template.save(Author("045345", "Alice Smith"))
+        repository.insert(Author(ObjectId(),"Bob Smith"))
+        repository.insert(Author(ObjectId(), "Alice Smith"))
 
     }
 }
