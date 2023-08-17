@@ -9,7 +9,6 @@ class AuthorResponseMapper() {
 
     fun map(author: Author): AuthorResponse = with(author) {
         AuthorResponse(
-                id = id,
                 name = name
         )
     }

@@ -43,7 +43,6 @@ class AuthorServiceImpl(
         authorRepository.findById(id)?.run {
             authorRepository.deleteById(id)
         } ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Author with id $id not found.")
-
     }
 
 }
