@@ -31,7 +31,7 @@ class AuthorServiceImpl(
     }
 
     override fun createAuthor(authorRequest: AuthorRequest): Author {
-        return authorRepository.insert(authorDomainMapper.map(authorRequest))
+        return authorDomainMapper.map(authorRequest).run(authorRepository::insert)
     }
 
     override fun updateAuthor(command: AuthorUpdateCommand): Author {

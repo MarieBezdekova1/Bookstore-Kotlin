@@ -23,7 +23,7 @@ class WebSecurityConfig {
         http
                 .authorizeHttpRequests { requests ->
                     requests
-                            .requestMatchers(HttpMethod.POST).hasRole("USER1")
+                            .requestMatchers(HttpMethod.POST).hasRole("USER")
                             .requestMatchers("/api/v1/authors").permitAll()
                             .anyRequest().authenticated()
                 }
