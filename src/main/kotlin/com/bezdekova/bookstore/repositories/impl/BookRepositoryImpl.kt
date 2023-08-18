@@ -1,5 +1,6 @@
 package com.bezdekova.bookstore.repositories.impl
 
+import com.bezdekova.bookstore.db.Author
 import com.bezdekova.bookstore.db.Book
 import com.bezdekova.bookstore.model.command.BookUpdateCommand
 import com.bezdekova.bookstore.repositories.AuthorRepository
@@ -26,6 +27,13 @@ class BookRepositoryImpl(
     override fun findById(id: String): Book? {
         return mongoTemplate.findOne(
                 Query(Book::id isEqualTo id),
+                Book::class.java
+        )
+    }
+
+    override fun findBookByAuthor(author: Author): List<Book> {
+        return mongoTemplate.find(
+                Query(Book::author isEqualTo author),
                 Book::class.java
         )
     }

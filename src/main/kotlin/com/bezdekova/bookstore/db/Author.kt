@@ -8,4 +8,5 @@ import org.springframework.data.mongodb.core.mapping.Document
 data class Author(
         @Id
         val id: ObjectId,
-        var name: String)
+        var name: String
+)

@@ -41,6 +41,10 @@ class AuthorRepositoryImpl(
                 .let { PageableExecutionUtils.getPage(it.mappedResults, page) { count } }
     }
 
+    override fun findAll(): List<Author> {
+        return mongoTemplate.findAll(Author::class.java)
+    }
+
     override fun insert(domain: Author): Author {
         return mongoTemplate.insert(domain)
     }

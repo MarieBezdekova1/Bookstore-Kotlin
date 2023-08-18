@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable
 interface AuthorRepository {
     fun findById(id: String): Author?
     fun findAll(page: Pageable): Page<Author>
+    fun findAll(): List<Author>
     fun insert(domain: Author): Author
     fun update(command: AuthorUpdateCommand): Author?
     fun deleteById(id: String): DeleteResult
