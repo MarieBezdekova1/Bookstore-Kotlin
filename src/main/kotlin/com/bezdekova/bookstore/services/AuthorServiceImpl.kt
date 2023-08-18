@@ -24,10 +24,12 @@ class AuthorServiceImpl(
         private val bookShortResponseMapper: BookShortResponseMapper
 ) : AuthorService {
     override fun findAll(): Page<Author> {
-        val pageable = PageRequest.of(0, 5, Sort.by(
+        return Sort.by(
                 Sort.Order.asc("name"),
-                Sort.Order.desc("id")))
-        return authorRepository.findAll(pageable)
+                Sort.Order.desc("id")
+        ).let {
+            PageRequest.of(0, 5, it)
+        }.run(authorRepository::findAll)
     }
 
     override fun findAllAuthorsWithBooks(): List<AuthorWithBooksResponse> {
@@ -57,5 +59,4 @@ class AuthorServiceImpl(
             authorRepository.deleteById(id)
         } ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Author with id $id not found.")
     }
-
 }
