@@ -19,10 +19,13 @@ class AuthorServiceImpl(
         private val authorDomainMapper: AuthorDomainMapper
 ) : AuthorService {
     override fun findAll(): Page<Author> {
-        val pageable = PageRequest.of(0, 5, Sort.by(
-                Sort.Order.asc("name"),
-                Sort.Order.desc("id")))
-        return authorRepository.findAll(pageable)
+      // tady se dá krásně použít chain:
+      return Sort.by(
+        Sort.Order.asc("name"),
+        Sort.Order.desc("id")
+      ).let {
+        PageRequest.of(0, 5, it)
+      }.run(authorRepository::findAll)
     }
 
     override fun getAuthorById(id: String): Author {

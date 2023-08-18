@@ -1,6 +1,7 @@
 package com.bezdekova.bookstore.controllers
 
 import com.bezdekova.bookstore.constant.MappingConstants
+import com.bezdekova.bookstore.constant.MappingConstants.BOOKS
 import com.bezdekova.bookstore.mappers.command.BookCommandMapper
 import com.bezdekova.bookstore.mappers.response.BookResponseMapper
 import com.bezdekova.bookstore.model.request.BookRequest
@@ -17,12 +18,15 @@ class BookController internal constructor(
         private val bookCommandMapper: BookCommandMapper
 ) {
 
+  // Tohle je zajímavý přístup, který vidím poprvé. Běžně na to používáme akorát další funkci
     @get:ResponseStatus(HttpStatus.OK)
-    @get:GetMapping(MappingConstants.BOOKS)
+    // dá se importovat jen ta constanta. Zbavíš se pak toho prefixu - MappingConstants.BOOKS vs. BOOKS
+    @get:GetMapping(BOOKS)
     val allBooks: Page<BookResponse>
         get() = bookService.findAll()
                 .map(bookResponseMapper::map)
 
+  // toto: MappingConstants.BOOKS + "/{id} - může jít taky do constant - používáš to 3x stejně v jedné třídě.
     @GetMapping(MappingConstants.BOOKS + "/{id}")
     @ResponseStatus(HttpStatus.OK)
     fun getBook(@PathVariable id: String): BookResponse? {
