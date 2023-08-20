@@ -52,7 +52,7 @@ class BookServiceImpl(
     override fun addNewBook(bookRequest: BookRequest): String {
         val bookAsString = ObjectMapper().writeValueAsString(bookRequest)
 
-        rabbitTemplate.convertAndSend("book-registration", bookAsString)
+        rabbitTemplate.convertAndSend("spring-boot-exchange-direct","book", bookAsString)
         return bookAsString
     }
 
