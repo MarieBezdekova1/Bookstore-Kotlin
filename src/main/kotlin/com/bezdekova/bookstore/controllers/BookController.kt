@@ -2,6 +2,7 @@ package com.bezdekova.bookstore.controllers
 
 import com.bezdekova.bookstore.constant.MappingConstants.BOOKS
 import com.bezdekova.bookstore.constant.MappingConstants.BOOKS_ID
+import com.bezdekova.bookstore.constant.MappingConstants.REGISTER_BOOK
 import com.bezdekova.bookstore.mappers.command.BookCommandMapper
 import com.bezdekova.bookstore.mappers.response.BookResponseMapper
 import com.bezdekova.bookstore.model.request.BookRequest
@@ -50,6 +51,12 @@ class BookController internal constructor(
     @ResponseStatus(HttpStatus.OK)
     fun deleteBook(@PathVariable id: String) {
         return bookService.deleteBookById(id)
+    }
+
+    @PostMapping(REGISTER_BOOK)
+    @ResponseStatus(HttpStatus.OK)
+    fun addNewBookWithRabbitMQ(@RequestBody bookRequest: BookRequest): String? {
+        return bookService.addNewBook(bookRequest)
     }
 
 }

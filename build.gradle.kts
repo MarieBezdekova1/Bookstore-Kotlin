@@ -16,7 +16,7 @@ java {
 }
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
 dependencies {
@@ -26,6 +26,8 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect")
 	implementation("org.springframework.boot:spring-boot-starter-security")
 	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.1.0")
+	implementation("org.springframework.boot:spring-boot-starter-amqp")
+	implementation("com.fasterxml.jackson.core:jackson-databind")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
 

@@ -4,6 +4,12 @@ spring:
       uri: mongodb://localhost:27017/bookstore
   jpa:
     show-sql: 'true'
+  rabbitmq:
+    host: localhost
+    username: guest
+    password: guest
+    port: 5672
+    virtual-host: /
 springdoc:
   swagger-ui:
     path: /swagger

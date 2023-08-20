@@ -24,7 +24,7 @@ class WebSecurityConfig {
                 .authorizeHttpRequests { requests ->
                     requests
                             .requestMatchers(HttpMethod.POST).hasRole("USER")
-                            .requestMatchers("/api/v1/authors").permitAll()
+                            .requestMatchers("/api/v1/authors", "/swagger-ui/**", "/swagger").permitAll()
                             .anyRequest().authenticated()
                 }
                 .csrf { it.disable() }

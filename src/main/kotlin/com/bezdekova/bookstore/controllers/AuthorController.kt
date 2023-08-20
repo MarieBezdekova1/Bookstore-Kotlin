@@ -9,11 +9,13 @@ import com.bezdekova.bookstore.model.request.AuthorRequest
 import com.bezdekova.bookstore.model.response.AuthorResponse
 import com.bezdekova.bookstore.model.response.AuthorWithBooksResponse
 import com.bezdekova.bookstore.services.api.AuthorService
+import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import org.springframework.data.domain.Page
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 
 @RestController
+@SecurityRequirement(name = "securityschema")
 class AuthorController internal constructor(
         private val authorService: AuthorService,
         private val authorResponseMapper: AuthorResponseMapper,

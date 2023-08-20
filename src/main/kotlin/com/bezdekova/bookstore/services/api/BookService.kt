@@ -11,4 +11,5 @@ interface BookService {
     fun createBook(bookRequest: BookRequest): Book
     fun updateBook(command: BookUpdateCommand): Book
     fun deleteBookById(id: String)
+    fun addNewBook(bookRequest: BookRequest): String
 }

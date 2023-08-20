@@ -9,4 +9,6 @@ object MappingConstants {
 
     const val BOOKS = "$API_V1/books"
     const val BOOKS_ID = "$BOOKS/{id}"
+
+    const val REGISTER_BOOK = "$API_V1/registerBook"
 }

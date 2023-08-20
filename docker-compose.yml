@@ -9,5 +9,10 @@ services:
     restart: unless-stopped
     environment:
       MONGO_INITDB_DATABASE: bookstore
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    ports:
+      - "5672:5672"
+      - "15672:15672"
 volumes:
   mongodb_data_container:
