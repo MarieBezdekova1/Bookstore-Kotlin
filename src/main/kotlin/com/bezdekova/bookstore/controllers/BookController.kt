@@ -8,11 +8,13 @@ import com.bezdekova.bookstore.mappers.response.BookResponseMapper
 import com.bezdekova.bookstore.model.request.BookRequest
 import com.bezdekova.bookstore.model.response.BookResponse
 import com.bezdekova.bookstore.services.api.BookService
+import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import org.springframework.data.domain.Page
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 
 @RestController
+@SecurityRequirement(name = "securityschema")
 class BookController internal constructor(
         private val bookService: BookService,
         private val bookResponseMapper: BookResponseMapper,

@@ -2,7 +2,6 @@ package com.bezdekova.bookstore.config
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.http.HttpMethod
 import org.springframework.security.config.Customizer
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
@@ -23,8 +22,14 @@ class WebSecurityConfig {
         http
                 .authorizeHttpRequests { requests ->
                     requests
-                            .requestMatchers(HttpMethod.POST).hasRole("USER")
-                            .requestMatchers("/api/v1/authors", "/swagger-ui/**", "/swagger").permitAll()
+                            .requestMatchers(
+                                    //"/api/v1/authors",
+                                    "/v3/api-docs/**",
+                                    "/api-docs/**",
+                                    "/swagger-ui/**",
+                                    "swagger/**",
+                                    "/swagger-resources/**"
+                            ).permitAll()
                             .anyRequest().authenticated()
                 }
                 .csrf { it.disable() }
