@@ -2,6 +2,8 @@ package com.bezdekova.bookstore.controllers
 
 import com.bezdekova.bookstore.constant.MappingConstants.BOOKS
 import com.bezdekova.bookstore.constant.MappingConstants.BOOKS_ID
+import com.bezdekova.bookstore.constant.MappingConstants.IMPORT_BOOKS
+import com.bezdekova.bookstore.constant.MappingConstants.IMPORT_BOOKS_DEFAULT
 import com.bezdekova.bookstore.constant.MappingConstants.REGISTER_BOOK
 import com.bezdekova.bookstore.mappers.command.BookCommandMapper
 import com.bezdekova.bookstore.mappers.response.BookResponseMapper
@@ -9,6 +11,7 @@ import com.bezdekova.bookstore.model.request.BookRequest
 import com.bezdekova.bookstore.model.response.BookResponse
 import com.bezdekova.bookstore.services.api.BookService
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.domain.Page
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
@@ -59,6 +62,21 @@ class BookController internal constructor(
     @ResponseStatus(HttpStatus.OK)
     fun addNewBookWithRabbitMQ(@RequestBody bookRequest: BookRequest): String? {
         return bookService.addNewBook(bookRequest)
+    }
+
+    @PostMapping(IMPORT_BOOKS)
+    @ResponseStatus(HttpStatus.OK)
+    fun importBooks(@RequestParam filePath: String) {
+        bookService.importBooksFromCsv(filePath)
+    }
+
+    @Value("\${csv.books-file-path}")
+    private lateinit var booksCsvFile: String
+
+    @PostMapping(IMPORT_BOOKS_DEFAULT)
+    @ResponseStatus(HttpStatus.OK)
+    fun importBooksDefault() {
+        bookService.importBooksFromCsv(booksCsvFile)
     }
 
 }

@@ -3,6 +3,8 @@ package com.bezdekova.bookstore.controllers
 import com.bezdekova.bookstore.constant.MappingConstants.AUTHORS
 import com.bezdekova.bookstore.constant.MappingConstants.AUTHORS_ID
 import com.bezdekova.bookstore.constant.MappingConstants.AUTHORS_ONLY
+import com.bezdekova.bookstore.constant.MappingConstants.IMPORT_AUTHORS
+import com.bezdekova.bookstore.constant.MappingConstants.IMPORT_AUTHORS_DEFAULT
 import com.bezdekova.bookstore.mappers.command.AuthorCommandMapper
 import com.bezdekova.bookstore.mappers.response.AuthorResponseMapper
 import com.bezdekova.bookstore.model.request.AuthorRequest
@@ -10,6 +12,7 @@ import com.bezdekova.bookstore.model.response.AuthorResponse
 import com.bezdekova.bookstore.model.response.AuthorWithBooksResponse
 import com.bezdekova.bookstore.services.api.AuthorService
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.domain.Page
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
@@ -62,4 +65,18 @@ class AuthorController internal constructor(
         return authorService.deleteAuthorById(id)
     }
 
+    @PostMapping(IMPORT_AUTHORS)
+    @ResponseStatus(HttpStatus.OK)
+    fun importAuthors(@RequestParam filePath: String) {
+        authorService.importAuthorsFromCsv(filePath)
+    }
+
+    @Value("\${csv.authors-file-path}")
+    private lateinit var authorsCsvFile: String
+
+    @PostMapping(IMPORT_AUTHORS_DEFAULT)
+    @ResponseStatus(HttpStatus.OK)
+    fun importAuthorsDefault() {
+        authorService.importAuthorsFromCsv(authorsCsvFile)
+    }
 }

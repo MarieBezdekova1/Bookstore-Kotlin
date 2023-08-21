@@ -13,6 +13,7 @@ interface BookRepository {
     fun findBookByAuthor(author: Author): List<Book>
     fun findAll(page: Pageable): Page<Book>
     fun insert(domain: Book): Book
+    fun insertAll(books: List<Book>): MutableCollection<Book>
     fun update(command: BookUpdateCommand): Book?
     fun deleteById(id: String): DeleteResult
 

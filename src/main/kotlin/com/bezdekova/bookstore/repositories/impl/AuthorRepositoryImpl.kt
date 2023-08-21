@@ -49,6 +49,10 @@ class AuthorRepositoryImpl(
         return mongoTemplate.insert(domain)
     }
 
+    override fun insertAll(authors: List<Author>): MutableCollection<Author> {
+        return mongoTemplate.insertAll(authors)
+    }
+
     override fun update(command: AuthorUpdateCommand): Author? = with(command) {
         val query = Query(Author::id isEqualTo id)
         val update = Update().apply {

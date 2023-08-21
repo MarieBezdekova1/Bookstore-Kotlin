@@ -11,7 +11,7 @@ class BookDomainMapper(private val authorRepository: AuthorRepository) {
 
     fun map(request: BookRequest):Book {
         with(request) {
-            val author = authorRepository.findById(authorId)
+            val author = authorId?.let { authorRepository.findById(it) }
             return Book(
                     id = ObjectId(),
                     name = name,

@@ -12,4 +12,5 @@ interface BookService {
     fun updateBook(command: BookUpdateCommand): Book
     fun deleteBookById(id: String)
     fun addNewBook(bookRequest: BookRequest): String
+    fun importBooksFromCsv(filePath: String)
 }

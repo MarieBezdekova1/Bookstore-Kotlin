@@ -11,6 +11,7 @@ interface AuthorRepository {
     fun findAll(page: Pageable): Page<Author>
     fun findAll(): List<Author>
     fun insert(domain: Author): Author
+    fun insertAll(authors: List<Author>): MutableCollection<Author>
     fun update(command: AuthorUpdateCommand): Author?
     fun deleteById(id: String): DeleteResult
 }

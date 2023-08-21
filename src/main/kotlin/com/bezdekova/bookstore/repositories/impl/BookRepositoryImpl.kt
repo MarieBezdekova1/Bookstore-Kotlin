@@ -55,9 +55,13 @@ class BookRepositoryImpl(
         return mongoTemplate.insert(domain)
     }
 
+    override fun insertAll(books: List<Book>): MutableCollection<Book> {
+        return mongoTemplate.insertAll(books)
+    }
+
     override fun update(command: BookUpdateCommand): Book? = with(command) {
         val query = Query(Book::id isEqualTo id)
-        val author = authorRepository.findById(authorId)
+        val author = authorId?.let { authorRepository.findById(it) }
         val update = Update().apply {
             set(Book::name.toDotPath(), name)
             set(Book::price.toDotPath(), price)

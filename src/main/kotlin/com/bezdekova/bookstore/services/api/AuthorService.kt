@@ -13,4 +13,5 @@ interface AuthorService {
     fun createAuthor(authorRequest: AuthorRequest): Author
     fun updateAuthor(command: AuthorUpdateCommand): Author
     fun deleteAuthorById(id: String)
+    fun importAuthorsFromCsv(filePath: String)
 }

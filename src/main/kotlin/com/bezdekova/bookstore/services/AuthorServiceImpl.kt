@@ -9,12 +9,14 @@ import com.bezdekova.bookstore.model.response.AuthorWithBooksResponse
 import com.bezdekova.bookstore.repositories.AuthorRepository
 import com.bezdekova.bookstore.repositories.BookRepository
 import com.bezdekova.bookstore.services.api.AuthorService
+import com.opencsv.CSVReaderBuilder
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.web.server.ResponseStatusException
+import java.io.FileReader
 
 @Service
 class AuthorServiceImpl(
@@ -59,4 +61,36 @@ class AuthorServiceImpl(
             authorRepository.deleteById(id)
         } ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Author with id $id not found.")
     }
+
+    override fun importAuthorsFromCsv(filePath: String) {
+        val authorList = mutableListOf<Author>()
+        val reader = CSVReaderBuilder(FileReader(filePath)).build()
+
+        val batchSize = 10000
+        var count = 0
+        var maxCount = 0
+
+        reader.use { csvReader ->
+            var nextLine: Array<String>?
+            while (csvReader.readNext().also { nextLine = it } != null) {
+                nextLine?.get(0)?.run {
+                    authorList.add(authorDomainMapper.map(AuthorRequest(this)))
+                }
+
+                if (++count >= batchSize) authorList.let {
+                    authorRepository.insertAll(it)
+                    it.clear()
+                    maxCount += count
+                    println("Inserted $maxCount")
+                    count = 0
+                }
+            }
+        }
+
+        if (authorList.isNotEmpty()) {
+            authorRepository.insertAll(authorList)
+        }
+
+    }
+
 }

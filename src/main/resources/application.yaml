@@ -15,5 +15,6 @@ springdoc:
     path: /swagger
   api-docs:
     path: /api-docs
-
-
+csv:
+  authors-file-path: src/main/resources/csv/authors.csv
+  books-file-path: src/main/resources/csv/books.csv
