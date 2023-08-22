@@ -1,5 +1,7 @@
 package com.bezdekova.bookstore.config
 
+import com.bezdekova.bookstore.constant.QueueConstants.BOOK_QUEUE
+import com.bezdekova.bookstore.constant.QueueConstants.TEST_QUEUE
 import com.bezdekova.bookstore.services.listener.BookListener
 import org.springframework.amqp.core.Binding
 import org.springframework.amqp.core.BindingBuilder
@@ -15,9 +17,6 @@ import org.springframework.context.annotation.Configuration
 @Configuration
 class RabbitMQConfig {
 
-    private val QUEUE_NAME = "book-registration"
-    private val QUEUE_NAME2 = "test-queue"
-
     @Bean
     fun exchange(): DirectExchange {
         return DirectExchange("spring-boot-exchange-direct")
@@ -25,12 +24,12 @@ class RabbitMQConfig {
 
     @Bean(name= ["bookQueue"])
     fun createQueue(): Queue {
-        return Queue(QUEUE_NAME)
+        return Queue(BOOK_QUEUE)
     }
 
     @Bean(name= ["testQueue"])
     fun createQueue2(): Queue {
-        return Queue(QUEUE_NAME2)
+        return Queue(TEST_QUEUE)
     }
 
     @Bean
@@ -51,7 +50,7 @@ class RabbitMQConfig {
     @Bean
     fun container(connectionFactory: ConnectionFactory, listenerAdapter: MessageListenerAdapter): SimpleMessageListenerContainer {
         val container = SimpleMessageListenerContainer(connectionFactory)
-        container.setQueueNames(QUEUE_NAME)
+        container.setQueueNames(BOOK_QUEUE)
         container.setMessageListener(listenerAdapter)
         return container
     }

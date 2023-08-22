@@ -9,6 +9,7 @@ import com.bezdekova.bookstore.mappers.command.BookCommandMapper
 import com.bezdekova.bookstore.mappers.response.BookResponseMapper
 import com.bezdekova.bookstore.model.request.BookRequest
 import com.bezdekova.bookstore.model.response.BookResponse
+import com.bezdekova.bookstore.properties.CSVImportProperties
 import com.bezdekova.bookstore.services.api.BookService
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import org.springframework.beans.factory.annotation.Value
@@ -21,7 +22,8 @@ import org.springframework.web.bind.annotation.*
 class BookController internal constructor(
         private val bookService: BookService,
         private val bookResponseMapper: BookResponseMapper,
-        private val bookCommandMapper: BookCommandMapper
+        private val bookCommandMapper: BookCommandMapper,
+        private val csvImportProperties: CSVImportProperties
 ) {
 
     @GetMapping(BOOKS)
@@ -66,17 +68,19 @@ class BookController internal constructor(
 
     @PostMapping(IMPORT_BOOKS)
     @ResponseStatus(HttpStatus.OK)
+    // tady zkus spíše poslat soubor přes API - multipart file
     fun importBooks(@RequestParam filePath: String) {
         bookService.importBooksFromCsv(filePath)
     }
 
+    // toto se dá udělat pomocí configurace a injectu do constructoru - mrkni na directory properties + annotaci nad BookstoreApplication
     @Value("\${csv.books-file-path}")
     private lateinit var booksCsvFile: String
 
     @PostMapping(IMPORT_BOOKS_DEFAULT)
     @ResponseStatus(HttpStatus.OK)
     fun importBooksDefault() {
-        bookService.importBooksFromCsv(booksCsvFile)
+        bookService.importBooksFromCsv(csvImportProperties.booksFilePath)
     }
 
 }

@@ -13,9 +13,11 @@ object MappingConstants {
     const val REGISTER_BOOK = "$API_V1/registerBook"
 
     const val IMPORT_AUTHORS = "$API_V1/import/authors"
+    // tady by to bylo lepší s lomítkem /default
     const val IMPORT_AUTHORS_DEFAULT = "${IMPORT_AUTHORS}Default"
 
     const val IMPORT_BOOKS = "$API_V1/import/books"
+    // tady by to bylo lepší s lomítkem /default
     const val IMPORT_BOOKS_DEFAULT = "${IMPORT_BOOKS}Default"
 
 }

@@ -7,10 +7,13 @@ import io.swagger.v3.oas.annotations.security.SecurityScheme
 import org.bson.types.ObjectId
 import org.springframework.boot.CommandLineRunner
 import org.springframework.boot.autoconfigure.SpringBootApplication
+import org.springframework.boot.context.properties.ConfigurationPropertiesScan
 import org.springframework.boot.runApplication
 
 @SpringBootApplication
+// tahle annotace muze byt na configem security
 @SecurityScheme(name = "securityschema", scheme = "basic", type = SecuritySchemeType.HTTP)
+@ConfigurationPropertiesScan("com.bezdekova.bookstore")
 class BookstoreApplication(private var repository: AuthorRepository, ) : CommandLineRunner {
 
     companion object {

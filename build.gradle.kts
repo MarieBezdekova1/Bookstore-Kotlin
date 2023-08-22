@@ -30,6 +30,7 @@ dependencies {
 	implementation("com.fasterxml.jackson.core:jackson-databind")
 	implementation("com.opencsv:opencsv:5.7.1")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+	api("io.github.microutils:kotlin-logging-jvm:2.1.21")
 }
 
 tasks.withType<KotlinCompile> {
