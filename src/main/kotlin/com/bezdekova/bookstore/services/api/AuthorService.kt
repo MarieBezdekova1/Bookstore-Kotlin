@@ -5,6 +5,7 @@ import com.bezdekova.bookstore.model.command.AuthorUpdateCommand
 import com.bezdekova.bookstore.model.request.AuthorRequest
 import com.bezdekova.bookstore.model.response.AuthorWithBooksResponse
 import org.springframework.data.domain.Page
+import org.springframework.web.multipart.MultipartFile
 
 interface AuthorService {
     fun findAll(): Page<Author>
@@ -13,5 +14,5 @@ interface AuthorService {
     fun createAuthor(authorRequest: AuthorRequest): Author
     fun updateAuthor(command: AuthorUpdateCommand): Author
     fun deleteAuthorById(id: String)
-    fun importAuthorsFromCsv(filePath: String)
+    fun importAuthorsFromCsv(file: MultipartFile)
 }

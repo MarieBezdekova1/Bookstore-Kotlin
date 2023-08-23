@@ -1,5 +1,7 @@
 package com.bezdekova.bookstore.config
 
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeType
+import io.swagger.v3.oas.annotations.security.SecurityScheme
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.Customizer
@@ -14,6 +16,7 @@ import org.springframework.security.web.SecurityFilterChain
 
 @Configuration
 @EnableWebSecurity
+@SecurityScheme(name = "securityschema", scheme = "basic", type = SecuritySchemeType.HTTP)
 class WebSecurityConfig {
 
     @Bean

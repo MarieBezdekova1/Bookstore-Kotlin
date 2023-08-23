@@ -1,4 +1,9 @@
 spring:
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 200MB
+      max-request-size: 200MB
   data:
     mongodb:
       uri: mongodb://localhost:27017/bookstore
@@ -15,6 +20,7 @@ springdoc:
     path: /swagger
   api-docs:
     path: /api-docs
-csv:
+csv-import:
   authors-file-path: src/main/resources/csv/authors.csv
   books-file-path: src/main/resources/csv/books.csv
+  batch-size: 10000

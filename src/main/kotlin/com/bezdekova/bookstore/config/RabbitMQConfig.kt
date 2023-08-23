@@ -1,22 +1,19 @@
 package com.bezdekova.bookstore.config
 
-import com.bezdekova.bookstore.services.listener.BookListener
+import com.bezdekova.bookstore.constant.QueueConstants.BOOK_QUEUE
+import com.bezdekova.bookstore.constant.QueueConstants.TEST_QUEUE
 import org.springframework.amqp.core.Binding
 import org.springframework.amqp.core.BindingBuilder
 import org.springframework.amqp.core.DirectExchange
 import org.springframework.amqp.core.Queue
 import org.springframework.amqp.rabbit.connection.ConnectionFactory
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer
-import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
 @Configuration
 class RabbitMQConfig {
-
-    private val QUEUE_NAME = "book-registration"
-    private val QUEUE_NAME2 = "test-queue"
 
     @Bean
     fun exchange(): DirectExchange {
@@ -25,12 +22,12 @@ class RabbitMQConfig {
 
     @Bean(name= ["bookQueue"])
     fun createQueue(): Queue {
-        return Queue(QUEUE_NAME)
+        return Queue(BOOK_QUEUE)
     }
 
     @Bean(name= ["testQueue"])
     fun createQueue2(): Queue {
-        return Queue(QUEUE_NAME2)
+        return Queue(TEST_QUEUE)
     }
 
     @Bean
@@ -44,16 +41,8 @@ class RabbitMQConfig {
     }
 
     @Bean
-    fun listenerAdapter(bookListener: BookListener): MessageListenerAdapter {
-        return MessageListenerAdapter(bookListener, "onBookRegistration")
-    }
-
-    @Bean
-    fun container(connectionFactory: ConnectionFactory, listenerAdapter: MessageListenerAdapter): SimpleMessageListenerContainer {
-        val container = SimpleMessageListenerContainer(connectionFactory)
-        container.setQueueNames(QUEUE_NAME)
-        container.setMessageListener(listenerAdapter)
-        return container
+    fun container(connectionFactory: ConnectionFactory): SimpleMessageListenerContainer {
+        return SimpleMessageListenerContainer(connectionFactory)
     }
 
 }

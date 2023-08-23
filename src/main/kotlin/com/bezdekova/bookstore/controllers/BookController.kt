@@ -7,21 +7,28 @@ import com.bezdekova.bookstore.constant.MappingConstants.IMPORT_BOOKS_DEFAULT
 import com.bezdekova.bookstore.constant.MappingConstants.REGISTER_BOOK
 import com.bezdekova.bookstore.mappers.command.BookCommandMapper
 import com.bezdekova.bookstore.mappers.response.BookResponseMapper
+import com.bezdekova.bookstore.messaging.BookProducer
 import com.bezdekova.bookstore.model.request.BookRequest
 import com.bezdekova.bookstore.model.response.BookResponse
+import com.bezdekova.bookstore.properties.CSVImportProperties
 import com.bezdekova.bookstore.services.api.BookService
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.domain.Page
 import org.springframework.http.HttpStatus
+import org.springframework.mock.web.MockMultipartFile
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.multipart.MultipartFile
+import java.io.File
+import java.nio.file.Files
 
 @RestController
 @SecurityRequirement(name = "securityschema")
-class BookController internal constructor(
+class BookController (
         private val bookService: BookService,
+        private val bookProducer: BookProducer,
         private val bookResponseMapper: BookResponseMapper,
-        private val bookCommandMapper: BookCommandMapper
+        private val bookCommandMapper: BookCommandMapper,
+        private val csvImportProperties: CSVImportProperties
 ) {
 
     @GetMapping(BOOKS)
@@ -60,23 +67,24 @@ class BookController internal constructor(
 
     @PostMapping(REGISTER_BOOK)
     @ResponseStatus(HttpStatus.OK)
-    fun addNewBookWithRabbitMQ(@RequestBody bookRequest: BookRequest): String? {
-        return bookService.addNewBook(bookRequest)
+    fun addNewBookWithRabbitMQ(@RequestBody bookRequest: BookRequest) {
+        return bookProducer.addNewBook(bookRequest)
     }
 
     @PostMapping(IMPORT_BOOKS)
     @ResponseStatus(HttpStatus.OK)
-    fun importBooks(@RequestParam filePath: String) {
-        bookService.importBooksFromCsv(filePath)
+    fun importBooks(@RequestParam file: MultipartFile) {
+        bookService.importBooksFromCsv(file)
     }
-
-    @Value("\${csv.books-file-path}")
-    private lateinit var booksCsvFile: String
 
     @PostMapping(IMPORT_BOOKS_DEFAULT)
     @ResponseStatus(HttpStatus.OK)
     fun importBooksDefault() {
-        bookService.importBooksFromCsv(booksCsvFile)
+        val filePath = csvImportProperties.booksFilePath
+        val file = File(filePath)
+        val multipartFile = MockMultipartFile(
+                file.name, file.name, "application/octet-stream", Files.readAllBytes(file.toPath()))
+        bookService.importBooksFromCsv(multipartFile)
     }
 
 }

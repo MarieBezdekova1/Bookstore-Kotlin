@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component
 @Component
 class BookDomainMapper(private val authorRepository: AuthorRepository) {
 
-    fun map(request: BookRequest):Book {
+    fun map(request: BookRequest): Book {
         with(request) {
             val author = authorId?.let { authorRepository.findById(it) }
             return Book(
