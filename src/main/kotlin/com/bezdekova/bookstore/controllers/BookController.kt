@@ -7,7 +7,6 @@ import com.bezdekova.bookstore.constant.MappingConstants.IMPORT_BOOKS_DEFAULT
 import com.bezdekova.bookstore.constant.MappingConstants.REGISTER_BOOK
 import com.bezdekova.bookstore.mappers.command.BookCommandMapper
 import com.bezdekova.bookstore.mappers.response.BookResponseMapper
-import com.bezdekova.bookstore.messaging.BookProducer
 import com.bezdekova.bookstore.model.request.BookRequest
 import com.bezdekova.bookstore.model.response.BookResponse
 import com.bezdekova.bookstore.properties.CSVImportProperties
@@ -25,7 +24,6 @@ import java.nio.file.Files
 @SecurityRequirement(name = "securityschema")
 class BookController (
         private val bookService: BookService,
-        private val bookProducer: BookProducer,
         private val bookResponseMapper: BookResponseMapper,
         private val bookCommandMapper: BookCommandMapper,
         private val csvImportProperties: CSVImportProperties
@@ -68,7 +66,7 @@ class BookController (
     @PostMapping(REGISTER_BOOK)
     @ResponseStatus(HttpStatus.OK)
     fun addNewBookWithRabbitMQ(@RequestBody bookRequest: BookRequest) {
-        return bookProducer.addNewBook(bookRequest)
+        return bookService.registerNewBook(bookRequest)
     }
 
     @PostMapping(IMPORT_BOOKS)

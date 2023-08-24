@@ -83,10 +83,7 @@ class AuthorServiceImpl(
         reader.use { csvReader ->
             var nextLine: Array<String>?
             while (csvReader.readNext().also { nextLine = it } != null) {
-                nextLine?.let {
-                    val author = authorCsvMapper.map(it)
-                    authorList.add(author)
-                }
+                nextLine?.let(authorCsvMapper::map)?.also(authorList::add)
 
                 if (++count >= batchSize) authorList.let {
                     authorRepository.insertAll(it)

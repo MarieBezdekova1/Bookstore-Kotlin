@@ -3,6 +3,7 @@ package com.bezdekova.bookstore.services
 import com.bezdekova.bookstore.db.Book
 import com.bezdekova.bookstore.mappers.csv.BookCsvMapper
 import com.bezdekova.bookstore.mappers.domain.BookDomainMapper
+import com.bezdekova.bookstore.messaging.BookProducer
 import com.bezdekova.bookstore.model.command.BookUpdateCommand
 import com.bezdekova.bookstore.model.request.BookRequest
 import com.bezdekova.bookstore.properties.CSVImportProperties
@@ -25,7 +26,8 @@ class BookServiceImpl(
         private val bookRepository: BookRepository,
         private val bookDomainMapper: BookDomainMapper,
         private val bookCsvMapper: BookCsvMapper,
-        private val csvImportProperties: CSVImportProperties
+        private val csvImportProperties: CSVImportProperties,
+        private val bookProducer: BookProducer
 ) : BookService {
 
     val log: Logger = LoggerFactory.getLogger(this.javaClass.name)
@@ -43,6 +45,7 @@ class BookServiceImpl(
     }
 
     override fun createBook(bookRequest: BookRequest): Book {
+        println(bookRequest)
         return bookDomainMapper.map(bookRequest).run(bookRepository::insert)
     }
 
@@ -68,10 +71,7 @@ class BookServiceImpl(
         reader.use { csvReader ->
             var nextLine: Array<String>?
             while (csvReader.readNext().also { nextLine = it } != null) {
-                nextLine?.let {
-                    val book = bookCsvMapper.map(it)
-                    bookList.add(book)
-                }
+                nextLine?.let(bookCsvMapper::map)?.also(bookList::add)
 
                 if (++count >= batchSize) bookList.let {
                     bookRepository.insertAll(it)
@@ -80,7 +80,6 @@ class BookServiceImpl(
                     log.info("Inserted $maxCount")
                     count = 0
                 }
-
             }
         }
 
@@ -90,6 +89,10 @@ class BookServiceImpl(
             log.info("Inserted $maxCount books.")
         }
 
+    }
+
+    override fun registerNewBook(bookRequest: BookRequest) {
+        bookProducer.addNewBook(bookRequest)
     }
 
 }

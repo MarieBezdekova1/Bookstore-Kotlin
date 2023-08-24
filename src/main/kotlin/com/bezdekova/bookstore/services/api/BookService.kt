@@ -13,4 +13,5 @@ interface BookService {
     fun updateBook(command: BookUpdateCommand): Book
     fun deleteBookById(id: String)
     fun importBooksFromCsv(file: MultipartFile)
+    fun registerNewBook(bookRequest: BookRequest)
 }
