@@ -18,5 +18,6 @@ object MappingConstants {
     const val IMPORT_BOOKS = "$API_V1/import/books"
     const val IMPORT_BOOKS_DEFAULT = "$IMPORT_BOOKS/default"
 
-    const val EXPORT_AUTHORS = "$API_V1/export/books"
+    const val EXPORT_AUTHORS = "$API_V1/export/authors"
+    const val EXPORT_BOOKS = "$API_V1/export/books"
 }

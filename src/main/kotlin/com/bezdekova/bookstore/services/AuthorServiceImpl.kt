@@ -7,21 +7,29 @@ import com.bezdekova.bookstore.mappers.response.BookShortResponseMapper
 import com.bezdekova.bookstore.model.command.AuthorUpdateCommand
 import com.bezdekova.bookstore.model.request.AuthorRequest
 import com.bezdekova.bookstore.model.response.AuthorWithBooksResponse
-import com.bezdekova.bookstore.properties.CSVImportProperties
+import com.bezdekova.bookstore.properties.CsvProperties
 import com.bezdekova.bookstore.repositories.AuthorRepository
 import com.bezdekova.bookstore.repositories.BookRepository
 import com.bezdekova.bookstore.services.api.AuthorService
+import com.bezdekova.bookstore.utils.getNow
 import com.opencsv.CSVReaderBuilder
+import com.opencsv.CSVWriter
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
+import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
+import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.server.ResponseStatusException
-import java.io.InputStreamReader
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody
+import java.io.*
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 @Service
 class AuthorServiceImpl(
@@ -30,7 +38,7 @@ class AuthorServiceImpl(
         private val authorDomainMapper: AuthorDomainMapper,
         private val bookShortResponseMapper: BookShortResponseMapper,
         private val authorCsvMapper: AuthorCsvMapper,
-        private val csvImportProperties: CSVImportProperties
+        private val csvProperties: CsvProperties
 ) : AuthorService {
 
     val log: Logger = LoggerFactory.getLogger(this.javaClass.name)
@@ -76,7 +84,7 @@ class AuthorServiceImpl(
         val authorList = mutableListOf<Author>()
         val reader = CSVReaderBuilder(InputStreamReader(file.inputStream)).build()
 
-        val batchSize = csvImportProperties.batchSize
+        val batchSize = csvProperties.batchSize
         var count = 0
         var maxCount = 0
 
@@ -101,6 +109,55 @@ class AuthorServiceImpl(
             log.info("Inserted $maxCount authors.")
         }
 
+    }
+
+    fun exportAuthorsToCsvSimple(filePath: String) {
+        val authors = authorRepository.findAll()
+
+        CSVWriter(FileWriter(filePath)).use { csvWriter ->
+            csvWriter.writeNext(arrayOf("ID", "Name"))
+            authors.forEach { author ->
+                csvWriter.writeNext(arrayOf(author.id.toString(), author.name))
+            }
+        }
+    }
+
+    override fun exportAuthorsToCsv(): ResponseEntity<StreamingResponseBody> {
+        val fileName = "${csvProperties.exportFilePath}/authorsExport-${getNow()}.csv"
+        val batchSize = csvProperties.batchSize
+
+        CSVWriter(FileOutputStream(File(fileName)).writer()).use { csvWriter ->
+            csvWriter.writeNext(arrayOf("ID", "Name"))
+
+            var page = 0
+            var authors: List<Author>
+
+            do {
+                authors = Sort.by(
+                        Sort.Order.asc("name"),
+                        Sort.Order.desc("id")
+                ).let { PageRequest.of(page++, batchSize, it) }
+                        .let { pageable ->
+                            authorRepository.findAll(pageable).content
+                        }
+                authors.forEach { author ->
+                    csvWriter.writeNext(arrayOf(author.id.toString(), author.name))
+                }
+                log.info("Exporting page $page for batch size $batchSize")
+            } while (authors.isNotEmpty())
+        }
+
+        val responseBody = StreamingResponseBody { outputStream ->
+            OutputStreamWriter(outputStream).use { writer ->
+                writer.write("Export done into $fileName")
+            }
+        }
+
+        val headers = HttpHeaders()
+        headers.contentType = MediaType.TEXT_PLAIN
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(responseBody)
     }
 
 }

@@ -8,13 +8,15 @@ import org.springframework.stereotype.Component
 @Component
 class BookCsvMapper(private val authorRepository: AuthorRepository) {
 
-    fun map(csvLine: Array<String>): Book {
-        val author = csvLine[2].let { authorRepository.findById(it) }
-        return Book(
-                id = ObjectId(),
-                name = csvLine[0],
-                price = csvLine[1].toIntOrNull(),
-                author = author
-        )
+    fun map(csvLine: Array<String>): Book? {
+        val author = csvLine.getOrNull(2)?.let { authorRepository.findById(it) }
+        return csvLine[0]?.run {
+            Book(
+                    id = ObjectId(),
+                    name = csvLine[0],
+                    price = csvLine.getOrNull(1)?.toIntOrNull(),
+                    author = author
+            )
+        }
     }
 }

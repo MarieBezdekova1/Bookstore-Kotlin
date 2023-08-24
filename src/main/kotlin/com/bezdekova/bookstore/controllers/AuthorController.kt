@@ -3,6 +3,7 @@ package com.bezdekova.bookstore.controllers
 import com.bezdekova.bookstore.constant.MappingConstants.AUTHORS
 import com.bezdekova.bookstore.constant.MappingConstants.AUTHORS_ID
 import com.bezdekova.bookstore.constant.MappingConstants.AUTHORS_ONLY
+import com.bezdekova.bookstore.constant.MappingConstants.EXPORT_AUTHORS
 import com.bezdekova.bookstore.constant.MappingConstants.IMPORT_AUTHORS
 import com.bezdekova.bookstore.constant.MappingConstants.IMPORT_AUTHORS_DEFAULT
 import com.bezdekova.bookstore.mappers.command.AuthorCommandMapper
@@ -10,14 +11,16 @@ import com.bezdekova.bookstore.mappers.response.AuthorResponseMapper
 import com.bezdekova.bookstore.model.request.AuthorRequest
 import com.bezdekova.bookstore.model.response.AuthorResponse
 import com.bezdekova.bookstore.model.response.AuthorWithBooksResponse
-import com.bezdekova.bookstore.properties.CSVImportProperties
+import com.bezdekova.bookstore.properties.CsvProperties
 import com.bezdekova.bookstore.services.api.AuthorService
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import org.springframework.data.domain.Page
 import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import org.springframework.mock.web.MockMultipartFile
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody
 import java.io.File
 import java.nio.file.Files
 
@@ -27,7 +30,7 @@ class AuthorController internal constructor(
         private val authorService: AuthorService,
         private val authorResponseMapper: AuthorResponseMapper,
         private val authorCommandMapper: AuthorCommandMapper,
-        private val csvImportProperties: CSVImportProperties
+        private val csvProperties: CsvProperties
 ) {
 
     @GetMapping(AUTHORS_ONLY)
@@ -79,10 +82,17 @@ class AuthorController internal constructor(
     @PostMapping(IMPORT_AUTHORS_DEFAULT)
     @ResponseStatus(HttpStatus.OK)
     fun importAuthorsDefault() {
-        val filePath = csvImportProperties.authorsFilePath
+        val filePath = csvProperties.authorsFilePath
         val file = File(filePath)
         val multipartFile = MockMultipartFile(
                 file.name, file.name, "application/octet-stream", Files.readAllBytes(file.toPath()))
         authorService.importAuthorsFromCsv(multipartFile)
     }
+
+    @GetMapping(EXPORT_AUTHORS)
+    @ResponseStatus(HttpStatus.OK)
+    fun exportAuthors(): ResponseEntity<StreamingResponseBody> {
+        return authorService.exportAuthorsToCsv()
+    }
+
 }

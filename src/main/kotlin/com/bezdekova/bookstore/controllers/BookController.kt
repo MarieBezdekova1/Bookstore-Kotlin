@@ -1,5 +1,6 @@
 package com.bezdekova.bookstore.controllers
 
+import com.bezdekova.bookstore.constant.MappingConstants
 import com.bezdekova.bookstore.constant.MappingConstants.BOOKS
 import com.bezdekova.bookstore.constant.MappingConstants.BOOKS_ID
 import com.bezdekova.bookstore.constant.MappingConstants.IMPORT_BOOKS
@@ -9,14 +10,16 @@ import com.bezdekova.bookstore.mappers.command.BookCommandMapper
 import com.bezdekova.bookstore.mappers.response.BookResponseMapper
 import com.bezdekova.bookstore.model.request.BookRequest
 import com.bezdekova.bookstore.model.response.BookResponse
-import com.bezdekova.bookstore.properties.CSVImportProperties
+import com.bezdekova.bookstore.properties.CsvProperties
 import com.bezdekova.bookstore.services.api.BookService
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import org.springframework.data.domain.Page
 import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import org.springframework.mock.web.MockMultipartFile
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody
 import java.io.File
 import java.nio.file.Files
 
@@ -26,7 +29,7 @@ class BookController (
         private val bookService: BookService,
         private val bookResponseMapper: BookResponseMapper,
         private val bookCommandMapper: BookCommandMapper,
-        private val csvImportProperties: CSVImportProperties
+        private val csvProperties: CsvProperties
 ) {
 
     @GetMapping(BOOKS)
@@ -78,11 +81,17 @@ class BookController (
     @PostMapping(IMPORT_BOOKS_DEFAULT)
     @ResponseStatus(HttpStatus.OK)
     fun importBooksDefault() {
-        val filePath = csvImportProperties.booksFilePath
+        val filePath = csvProperties.booksFilePath
         val file = File(filePath)
         val multipartFile = MockMultipartFile(
                 file.name, file.name, "application/octet-stream", Files.readAllBytes(file.toPath()))
         bookService.importBooksFromCsv(multipartFile)
+    }
+
+    @GetMapping(MappingConstants.EXPORT_BOOKS)
+    @ResponseStatus(HttpStatus.OK)
+    fun exportBooks(): ResponseEntity<StreamingResponseBody> {
+        return bookService.exportBooksToCsv()
     }
 
 }

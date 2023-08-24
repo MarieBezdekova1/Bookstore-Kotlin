@@ -4,6 +4,9 @@ spring:
       enabled: true
       max-file-size: 200MB
       max-request-size: 200MB
+  mvc:
+    async:
+      request-timeout: 300000
   data:
     mongodb:
       uri: mongodb://localhost:27017/bookstore
@@ -23,4 +26,5 @@ springdoc:
 csv-import:
   authors-file-path: src/main/resources/csv/authors.csv
   books-file-path: src/main/resources/csv/books.csv
-  batch-size: 10000
+  export-file-path: src/main/resources/csv
+  batch-size: 100000
