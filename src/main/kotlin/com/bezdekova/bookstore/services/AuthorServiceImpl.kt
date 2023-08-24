@@ -19,17 +19,12 @@ import org.slf4j.LoggerFactory
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
-import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
-import org.springframework.http.MediaType
-import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.server.ResponseStatusException
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody
 import java.io.*
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 
 @Service
 class AuthorServiceImpl(
@@ -122,7 +117,7 @@ class AuthorServiceImpl(
         }
     }
 
-    override fun exportAuthorsToCsv(): ResponseEntity<StreamingResponseBody> {
+    override fun exportAuthorsToCsv(): StreamingResponseBody {
         val fileName = "${csvProperties.exportFilePath}/authorsExport-${getNow()}.csv"
         val batchSize = csvProperties.batchSize
 
@@ -144,20 +139,14 @@ class AuthorServiceImpl(
                     csvWriter.writeNext(arrayOf(author.id.toString(), author.name))
                 }
                 log.info("Exporting page $page for batch size $batchSize")
-            } while (authors.isNotEmpty())
+            } while (authors.isNotEmpty() && page < 2)
         }
 
-        val responseBody = StreamingResponseBody { outputStream ->
+        return StreamingResponseBody { outputStream ->
             OutputStreamWriter(outputStream).use { writer ->
                 writer.write("Export done into $fileName")
             }
         }
-
-        val headers = HttpHeaders()
-        headers.contentType = MediaType.TEXT_PLAIN
-        return ResponseEntity.ok()
-                .headers(headers)
-                .body(responseBody)
     }
 
 }

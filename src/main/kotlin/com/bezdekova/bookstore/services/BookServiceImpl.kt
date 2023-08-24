@@ -17,10 +17,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
-import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
-import org.springframework.http.MediaType
-import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.server.ResponseStatusException
@@ -104,7 +101,7 @@ class BookServiceImpl(
         bookProducer.addNewBook(bookRequest)
     }
 
-    override fun exportBooksToCsv(): ResponseEntity<StreamingResponseBody> {
+    override fun exportBooksToCsv(): StreamingResponseBody {
         val fileName = "${csvProperties.exportFilePath}/booksExport-${getNow()}.csv"
         val batchSize = csvProperties.batchSize
 
@@ -129,17 +126,11 @@ class BookServiceImpl(
             } while (books.isNotEmpty())
         }
 
-        val responseBody = StreamingResponseBody { outputStream ->
+        return StreamingResponseBody { outputStream ->
             OutputStreamWriter(outputStream).use { writer ->
                 writer.write("Export done into $fileName")
             }
         }
-
-        val headers = HttpHeaders()
-        headers.contentType = MediaType.TEXT_PLAIN
-        return ResponseEntity.ok()
-                .headers(headers)
-                .body(responseBody)
     }
 
 }

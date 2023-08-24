@@ -15,7 +15,6 @@ import com.bezdekova.bookstore.services.api.BookService
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import org.springframework.data.domain.Page
 import org.springframework.http.HttpStatus
-import org.springframework.http.ResponseEntity
 import org.springframework.mock.web.MockMultipartFile
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
@@ -90,7 +89,7 @@ class BookController (
 
     @GetMapping(MappingConstants.EXPORT_BOOKS)
     @ResponseStatus(HttpStatus.OK)
-    fun exportBooks(): ResponseEntity<StreamingResponseBody> {
+    fun exportBooks(): StreamingResponseBody {
         return bookService.exportBooksToCsv()
     }
 

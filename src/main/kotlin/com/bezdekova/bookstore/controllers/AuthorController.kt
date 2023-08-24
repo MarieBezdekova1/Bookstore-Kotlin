@@ -16,7 +16,6 @@ import com.bezdekova.bookstore.services.api.AuthorService
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import org.springframework.data.domain.Page
 import org.springframework.http.HttpStatus
-import org.springframework.http.ResponseEntity
 import org.springframework.mock.web.MockMultipartFile
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
@@ -91,7 +90,7 @@ class AuthorController internal constructor(
 
     @GetMapping(EXPORT_AUTHORS)
     @ResponseStatus(HttpStatus.OK)
-    fun exportAuthors(): ResponseEntity<StreamingResponseBody> {
+    fun exportAuthors(): StreamingResponseBody {
         return authorService.exportAuthorsToCsv()
     }
 

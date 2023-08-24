@@ -10,7 +10,7 @@ class BookCsvMapper(private val authorRepository: AuthorRepository) {
 
     fun map(csvLine: Array<String>): Book? {
         val author = csvLine.getOrNull(2)?.let { authorRepository.findById(it) }
-        return csvLine[0]?.run {
+        return csvLine.getOrNull(0)?.run {
             Book(
                     id = ObjectId(),
                     name = csvLine[0],
