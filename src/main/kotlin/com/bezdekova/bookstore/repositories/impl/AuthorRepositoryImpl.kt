@@ -36,7 +36,7 @@ class AuthorRepositoryImpl(
                 Aggregation.sort(page.sort),
                 Aggregation.skip((page.pageNumber * page.pageSize).toLong()),
                 Aggregation.limit(page.pageSize.toLong()),
-        )
+        ).withOptions(Aggregation.newAggregationOptions().allowDiskUse(true).build())
                 .run { mongoTemplate.aggregate(this, Author::class.java) }
                 .let { PageableExecutionUtils.getPage(it.mappedResults, page) { count } }
     }

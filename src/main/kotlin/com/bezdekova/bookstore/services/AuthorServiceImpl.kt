@@ -121,6 +121,7 @@ class AuthorServiceImpl(
         val fileName = "${csvProperties.exportFilePath}/authorsExport-${getNow()}.csv"
         val batchSize = csvProperties.batchSize
 
+        /* // it streams to file, in response body is only successful message
         CSVWriter(FileOutputStream(File(fileName)).writer()).use { csvWriter ->
             csvWriter.writeNext(arrayOf("ID", "Name"))
 
@@ -139,13 +140,44 @@ class AuthorServiceImpl(
                     csvWriter.writeNext(arrayOf(author.id.toString(), author.name))
                 }
                 log.info("Exporting page $page for batch size $batchSize")
-            } while (authors.isNotEmpty() && page < 2)
+            } while (authors.isNotEmpty())
         }
 
         return StreamingResponseBody { outputStream ->
             OutputStreamWriter(outputStream).use { writer ->
                 writer.write("Export done into $fileName")
             }
+        }
+         */
+
+        // it writes to both file and output stream
+        return StreamingResponseBody { outputStream: OutputStream ->
+            FileOutputStream(File(fileName)).use { fileOutputStream ->
+                CSVWriter(fileOutputStream.writer()).use { csvWriter ->
+                    csvWriter.writeNext(arrayOf("ID", "Name"))
+
+                    val responseCsvWriter = CSVWriter(outputStream.writer())
+
+                    var page = 0
+                    var authors: List<Author>
+
+                    do {
+                        authors = Sort.by(
+                                Sort.Order.asc("name"),
+                                Sort.Order.desc("id")
+                        ).let { PageRequest.of(page++, batchSize, it) }
+                                .let { pageable ->
+                                    authorRepository.findAll(pageable).content
+                                }
+                        authors.forEach { author ->
+                            csvWriter.writeNext(arrayOf(author.id.toString(), author.name))
+                            responseCsvWriter.writeNext(arrayOf(author.id.toString(), author.name))
+                        }
+                        log.info("Exporting page $page for batch size $batchSize")
+                    } while (authors.isNotEmpty() && page < 10)
+                }
+            }
+            //outputStream.write("Export done into $fileName".toByteArray());
         }
     }
 
