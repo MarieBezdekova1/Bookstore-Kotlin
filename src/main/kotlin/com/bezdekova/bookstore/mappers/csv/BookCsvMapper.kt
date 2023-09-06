@@ -12,10 +12,10 @@ class BookCsvMapper(private val authorRepository: AuthorRepository) {
         val author = csvLine.getOrNull(2)?.let { authorRepository.findById(it) }
         return csvLine.getOrNull(0)?.run {
             Book(
-                    id = ObjectId(),
-                    name = csvLine[0],
-                    price = csvLine.getOrNull(1)?.toIntOrNull(),
-                    author = author
+                id = ObjectId(),
+                name = csvLine[0],
+                price = csvLine.getOrNull(1)?.toIntOrNull(),
+                author = author
             )
         }
     }

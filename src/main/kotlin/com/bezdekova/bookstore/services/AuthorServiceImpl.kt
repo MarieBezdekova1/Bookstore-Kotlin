@@ -19,7 +19,10 @@ import org.slf4j.LoggerFactory
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
+import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
+import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.server.ResponseStatusException
@@ -118,67 +121,64 @@ class AuthorServiceImpl(
     }
 
     override fun exportAuthorsToCsv(): StreamingResponseBody {
-        val fileName = "${csvProperties.exportFilePath}/authorsExport-${getNow()}.csv"
         val batchSize = csvProperties.batchSize
 
-        /* // it streams to file, in response body is only successful message
-        CSVWriter(FileOutputStream(File(fileName)).writer()).use { csvWriter ->
-            csvWriter.writeNext(arrayOf("ID", "Name"))
+        return StreamingResponseBody { outputStream: OutputStream ->
+            CSVWriter(outputStream.writer()).use { csvWriter ->
+                csvWriter.writeNext(arrayOf("ID", "Name"))
 
-            var page = 0
-            var authors: List<Author>
+                var page = 0
+                var authors: List<Author>
 
-            do {
-                authors = Sort.by(
+                do {
+                    authors = Sort.by(
                         Sort.Order.asc("name"),
                         Sort.Order.desc("id")
-                ).let { PageRequest.of(page++, batchSize, it) }
+                    ).let { PageRequest.of(page++, batchSize, it) }
                         .let { pageable ->
                             authorRepository.findAll(pageable).content
                         }
-                authors.forEach { author ->
-                    csvWriter.writeNext(arrayOf(author.id.toString(), author.name))
-                }
-                log.info("Exporting page $page for batch size $batchSize")
-            } while (authors.isNotEmpty())
-        }
-
-        return StreamingResponseBody { outputStream ->
-            OutputStreamWriter(outputStream).use { writer ->
-                writer.write("Export done into $fileName")
+                    authors.forEach { author ->
+                        csvWriter.writeNext(arrayOf(author.id.toString(), author.name))
+                    }
+                    log.info("Exporting page $page for batch size $batchSize")
+                } while (authors.isNotEmpty() && page < 6)
             }
         }
-         */
+    }
 
-        // it writes to both file and output stream
-        return StreamingResponseBody { outputStream: OutputStream ->
-            FileOutputStream(File(fileName)).use { fileOutputStream ->
-                CSVWriter(fileOutputStream.writer()).use { csvWriter ->
-                    csvWriter.writeNext(arrayOf("ID", "Name"))
+    override fun exportAuthorsToCsvResponseEntity(): ResponseEntity<StreamingResponseBody>{
+        val fileName = "${csvProperties.exportFilePath}/authorsExport-${getNow()}.csv"
+        val batchSize = csvProperties.batchSize
 
-                    val responseCsvWriter = CSVWriter(outputStream.writer())
+        return ResponseEntity.ok()
+            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=$fileName")
+            .contentType(MediaType.APPLICATION_OCTET_STREAM)
+            .body(StreamingResponseBody { outputStream ->
+                val writer = OutputStreamWriter(outputStream)
+                writer.write("ID,Name\n")
+                writer.flush()
 
-                    var page = 0
-                    var authors: List<Author>
+                var page = 0
+                var authors: List<Author>
 
-                    do {
-                        authors = Sort.by(
-                                Sort.Order.asc("name"),
-                                Sort.Order.desc("id")
-                        ).let { PageRequest.of(page++, batchSize, it) }
-                                .let { pageable ->
-                                    authorRepository.findAll(pageable).content
-                                }
-                        authors.forEach { author ->
-                            csvWriter.writeNext(arrayOf(author.id.toString(), author.name))
-                            responseCsvWriter.writeNext(arrayOf(author.id.toString(), author.name))
+                do {
+                    authors = Sort.by(
+                        Sort.Order.asc("name"),
+                        Sort.Order.desc("id")
+                    ).let { PageRequest.of(page++, batchSize, it) }
+                        .let { pageable ->
+                            authorRepository.findAll(pageable).content
                         }
-                        log.info("Exporting page $page for batch size $batchSize")
-                    } while (authors.isNotEmpty() && page < 10)
-                }
-            }
-            //outputStream.write("Export done into $fileName".toByteArray());
-        }
+                    authors.forEach { author ->
+                        outputStream.write("${author.id},${author.name}\n".toByteArray())
+                    }
+                    log.info("Exporting page $page for batch size $batchSize")
+                    outputStream.flush()
+
+                } while (authors.isNotEmpty() && page < 6)
+
+            })
     }
 
 }

@@ -4,6 +4,7 @@ import com.bezdekova.bookstore.constant.MappingConstants.AUTHORS
 import com.bezdekova.bookstore.constant.MappingConstants.AUTHORS_ID
 import com.bezdekova.bookstore.constant.MappingConstants.AUTHORS_ONLY
 import com.bezdekova.bookstore.constant.MappingConstants.EXPORT_AUTHORS
+import com.bezdekova.bookstore.constant.MappingConstants.EXPORT_AUTHORS2
 import com.bezdekova.bookstore.constant.MappingConstants.IMPORT_AUTHORS
 import com.bezdekova.bookstore.constant.MappingConstants.IMPORT_AUTHORS_DEFAULT
 import com.bezdekova.bookstore.mappers.command.AuthorCommandMapper
@@ -13,9 +14,14 @@ import com.bezdekova.bookstore.model.response.AuthorResponse
 import com.bezdekova.bookstore.model.response.AuthorWithBooksResponse
 import com.bezdekova.bookstore.properties.CsvProperties
 import com.bezdekova.bookstore.services.api.AuthorService
+import com.bezdekova.bookstore.utils.getNow
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
+import jakarta.servlet.http.HttpServletResponse
 import org.springframework.data.domain.Page
+import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
+import org.springframework.http.ResponseEntity
 import org.springframework.mock.web.MockMultipartFile
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
@@ -84,14 +90,21 @@ class AuthorController internal constructor(
         val filePath = csvProperties.authorsFilePath
         val file = File(filePath)
         val multipartFile = MockMultipartFile(
-                file.name, file.name, "application/octet-stream", Files.readAllBytes(file.toPath()))
+            file.name, file.name, "application/octet-stream", Files.readAllBytes(file.toPath()))
         authorService.importAuthorsFromCsv(multipartFile)
     }
 
-    @GetMapping(EXPORT_AUTHORS)
+    @GetMapping(EXPORT_AUTHORS, produces = [MediaType.APPLICATION_OCTET_STREAM_VALUE])
     @ResponseStatus(HttpStatus.OK)
-    fun exportAuthors(): StreamingResponseBody {
+    fun exportAuthors(response: HttpServletResponse): StreamingResponseBody {
+        val fileName = "${csvProperties.exportFilePath}/authorsExport-${getNow()}.csv"
+        response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=$fileName")
         return authorService.exportAuthorsToCsv()
+    }
+
+    @GetMapping(EXPORT_AUTHORS2)
+    fun downloadCsv(): ResponseEntity<StreamingResponseBody> {
+        return authorService.exportAuthorsToCsvResponseEntity()
     }
 
 }
